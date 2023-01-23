@@ -1,18 +1,21 @@
 package se.magictechnology.pia11jan23
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class ContactsFragment : Fragment() {
 
-    var contactsadapter = ContactsAdapter()
+    lateinit var contactsadapter : ContactsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,6 +28,21 @@ class ContactsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        contactsadapter = ContactsAdapter { clickedcontact ->
+            Log.i("pia11debug", "KLICK PÅ RAD")
+
+            //requireActivity().supportFragmentManager.beginTransaction().add(R.id.fragmentContainerView, ContactDetailFragment()).addToBackStack(null).commit()
+
+            var godetail = ContactDetailFragment()
+            godetail.currentcontact = clickedcontact
+
+            requireActivity().supportFragmentManager.commit {
+                add(R.id.fragmentContainerView, godetail)
+                addToBackStack(null)
+            }
+
+        }
+
         // View färdig
         val personRecview = view.findViewById<RecyclerView>(R.id.contactsRV)
 
@@ -33,16 +51,26 @@ class ContactsFragment : Fragment() {
 
 
         view.findViewById<Button>(R.id.addContactButton).setOnClickListener {
-            val contactName = view.findViewById<EditText>(R.id.addNameET).text.toString()
-            val contactPhone = view.findViewById<EditText>(R.id.addPhoneET).text.toString()
+            val contactName = view.findViewById<EditText>(R.id.addNameET)
+            val contactPhone = view.findViewById<EditText>(R.id.addPhoneET)
 
-            val tempContact = Contactperson()
-            tempContact.contactname = contactName
-            tempContact.contactphone = contactPhone
+            if(contactName.text.toString() == "" || contactPhone.text.toString() == "") {
+                // FEL, tomt värde
+                Toast.makeText(requireContext(), "Fyll i allt!", Toast.LENGTH_LONG).show()
+            } else {
+                val tempContact = Contactperson()
+                tempContact.contactname = contactName.text.toString()
+                tempContact.contactphone = contactPhone.text.toString()
 
-            contactsadapter.contacts.add(tempContact)
+                contactsadapter.contacts.add(tempContact)
 
-            contactsadapter.notifyDataSetChanged()
+                contactName.setText("")
+                contactPhone.setText("")
+
+                contactsadapter.notifyDataSetChanged()
+            }
+
+
         }
 
     }

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ViewHolder>() {
+class ContactsAdapter(val onItemClicked : (Contactperson) -> Unit) : RecyclerView.Adapter<ContactsAdapter.ViewHolder>() {
 
     var contacts = mutableListOf<Contactperson>()
 
@@ -39,7 +39,7 @@ class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ViewHolder>() {
         holder.contactPhone.text = contacts[position].contactphone
 
         holder.itemView.setOnClickListener {
-
+            onItemClicked(contacts[position])
         }
 
     }
